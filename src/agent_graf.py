@@ -1,4 +1,5 @@
 """Aynı agent'ın LangGraph sürümü: iki düğüm (llm, araclar) + koşullu kenar + hafıza (checkpointer)."""
+import json
 import operator
 import time
 from typing import Annotated, TypedDict
@@ -25,27 +26,41 @@ def llm_dugumu(durum):
     tur = durum["tur"] + 1
     mesajlar = [{"role": "system", "content": SISTEM_TALIMATI}] + durum["mesajlar"]
     t = time.perf_counter()
-    if tur > MAKS_TUR:
-        yanit = llm.istemci(durum["model"]).chat.completions.create(
-            model=durum["model"], messages=mesajlar, tools=ARAC_TANIMLARI, tool_choice="none", temperature=0)
-    else:
-        yanit = llm.sohbet(durum["model"], mesajlar, araclar=ARAC_TANIMLARI)
+    yanit = llm.sohbet(durum["model"], mesajlar, araclar=ARAC_TANIMLARI,
+                       tool_choice="none" if tur > MAKS_TUR else None)
     m = yanit.choices[0].message
     kayit = {"tur": tur, "tip": "llm", "sure": round(time.perf_counter() - t, 2),
              "girdi": yanit.usage.prompt_tokens, "cikti": yanit.usage.completion_tokens}
     return {"mesajlar": [m.model_dump(exclude_none=True)], "iz": [kayit], "tur": tur}
 
 
+TEKRAR_MESAJI = ("TEKRAR: Bu çağrıyı (aynı araç, aynı argümanlar) bu konuşmada zaten yaptın; sonucu yukarıdaki mesajlarda. "
+                 "Aynı çağrıyı tekrarlama: farklı bir araç ya da argüman dene veya elindeki bilgiyle cevap ver.")
+
+
+def cagri_anahtari(c):
+    """Aynı çağrıyı tanımak için: araç adı + argümanların sıralı JSON hâli (boşluk/sıra farkı önemsiz)."""
+    try:
+        argumanlar = json.dumps(json.loads(c["function"]["arguments"] or "{}"), sort_keys=True, ensure_ascii=False)
+    except json.JSONDecodeError:
+        argumanlar = c["function"]["arguments"]
+    return c["function"]["name"], argumanlar
+
+
 def arac_dugumu(durum):
     son = durum["mesajlar"][-1]
+    onceki = {cagri_anahtari(c) for m in durum["mesajlar"][:-1] for c in m.get("tool_calls") or []}
     yeni_mesajlar, kayitlar = [], []
     for c in son["tool_calls"]:
         t = time.perf_counter()
-        sonuc = arac_cagir(c["function"]["name"], c["function"]["arguments"])
+        anahtar = cagri_anahtari(c)
+        tekrar = anahtar in onceki
+        sonuc = TEKRAR_MESAJI if tekrar else arac_cagir(c["function"]["name"], c["function"]["arguments"])
+        onceki.add(anahtar)
         yeni_mesajlar.append({"role": "tool", "tool_call_id": c["id"], "content": sonuc})
         kayitlar.append({"tur": durum["tur"], "tip": "arac", "ad": c["function"]["name"],
                          "argumanlar": c["function"]["arguments"], "sure": round(time.perf_counter() - t, 2),
-                         "karakter": len(sonuc), "hata": sonuc.startswith("HATA")})
+                         "karakter": len(sonuc), "hata": sonuc.startswith("HATA"), "tekrar": tekrar})
     return {"mesajlar": yeni_mesajlar, "iz": kayitlar}
 
 

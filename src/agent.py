@@ -44,8 +44,7 @@ def calistir(soru, model=VARSAYILAN_MODEL, gecmis=None, maks_tur=MAKS_TUR, ayrin
                 print(f"[tur {tur}] {c.function.name}({c.function.arguments}) → {len(sonuc):,} kar.\n{sonuc[:300]}\n")
     else:
         tur_doldu = True
-        yanit = llm.istemci(model).chat.completions.create(
-            model=model, messages=mesajlar, tools=ARAC_TANIMLARI, tool_choice="none", temperature=0)
+        yanit = llm.sohbet(model, mesajlar, araclar=ARAC_TANIMLARI, tool_choice="none")
         girdi += yanit.usage.prompt_tokens
         cikti += yanit.usage.completion_tokens
         cevap = yanit.choices[0].message.content

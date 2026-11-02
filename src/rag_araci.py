@@ -1,4 +1,4 @@
-"""RAG aracı (06_rag_araci'den taşındı): yorum_ara (konu / ozetle / hepsi) + oyun_ara."""
+"""RAG aracı (06_rag_araci'den taşındı): yorum_ara (konu / ozetle / hepsi) + oyun_oner (eski adı oyun_ara)."""
 import json
 import math
 import time
@@ -315,7 +315,7 @@ RAG_ARAC_TANIMLARI = [
             "dil":    {"type": "string", "description": "Yorum dili kodu: tr, en, zh, ru, de, es, pt, fr..."}},
             "required": ["mod"]}}},
     {"type": "function", "function": {
-        "name": "oyun_ara",
+        "name": "oyun_oner",
         "description": OYUN_ARAC_ACIKLAMASI,
         "parameters": {"type": "object", "properties": {
             "istek":          {"type": "string", "description": "Kullanıcının aradığı oyunun tarifi."},
@@ -323,4 +323,4 @@ RAG_ARAC_TANIMLARI = [
             "required": ["istek"]}}},
 ]
 
-RAG_FONKSIYONLAR = {"yorum_ara": yorum_araci, "oyun_ara": oyun_araci}
+RAG_FONKSIYONLAR = {"yorum_ara": yorum_araci, "oyun_oner": oyun_araci}

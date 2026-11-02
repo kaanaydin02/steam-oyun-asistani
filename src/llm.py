@@ -14,10 +14,12 @@ SAGLAYICILAR = {
 
 MODELLER = {
     "gpt-4.1-mini":     "openai",
+    "gpt-6-luna":       "openai",
     "gemini-2.5-flash": "gemini",
     "deepseek-chat":    "deepseek",
     "qwen2.5:7b":       "ollama",
     "qwen2.5:14b":      "ollama",
+    "gpt-6.1-terra":    "openai",
 }
 
 _istemciler = {}
@@ -34,6 +36,15 @@ def istemci(model):
     return _istemciler[saglayici]
 
 
-def sohbet(model, mesajlar, araclar=None, temperature=0):
+# Modele özel ek API parametreleri (ör. düşünen modellerde araç çağırmak için düşünmeyi kapat)
+MODEL_AYARLARI = {
+    "gpt-6-luna": {"reasoning_effort": "none"},
+}
+
+
+def sohbet(model, mesajlar, araclar=None, temperature=0, tool_choice=None):
+    ek = dict(MODEL_AYARLARI.get(model, {}))
+    if tool_choice:
+        ek["tool_choice"] = tool_choice
     return istemci(model).chat.completions.create(
-        model=model, messages=mesajlar, tools=araclar, temperature=temperature)
+        model=model, messages=mesajlar, tools=araclar, temperature=temperature, **ek)
