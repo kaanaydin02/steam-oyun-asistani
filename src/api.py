@@ -37,6 +37,8 @@ class AracCagrisi(BaseModel):
     sure: float
     hata: bool
     tekrar: bool
+    cikti: str = Field("", description="Aracın LLM'e döndürdüğü metnin tamamı (LLM'in gördüğü).")
+    detay: dict | None = Field(None, description="RAG araçlarında yapılandırılmış ayrıntı: mod, filtreler, yorumlar, mesafeler.")
 
 
 class Cevap(BaseModel):
@@ -72,7 +74,8 @@ def sor(istek: SoruIstegi):
     except Exception as e:                  # sağlayıcı hatası, Ollama kapalı vb.
         raise HTTPException(502, f"{type(e).__name__}: {e}")
     araclar = [AracCagrisi(ad=a["ad"], argumanlar=a["argumanlar"], sure=a["sure"],
-                           hata=a.get("hata", False), tekrar=a.get("tekrar", False))
+                           hata=a.get("hata", False), tekrar=a.get("tekrar", False),
+                           cikti=a.get("sonuc_metni", ""), detay=a.get("detay"))
                for a in r["iz"] if a["tip"] == "arac"]
     return Cevap(cevap=r["cevap"], oturum=oturum, model=istek.model, tur=r["tur"], sure=r["sure"],
                  girdi_token=r["girdi_token"], cikti_token=r["cikti_token"], araclar=araclar)

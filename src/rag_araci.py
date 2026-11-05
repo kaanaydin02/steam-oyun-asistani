@@ -1,4 +1,5 @@
-"""RAG aracı (06_rag_araci'den taşındı): yorum_ara (konu / ozetle / hepsi) + oyun_oner (eski adı oyun_ara)."""
+"""RAG aracı (06_rag_araci'den taşındı): yorum_ara (konu / ozetle / hepsi) + oyun_oner (eski adı oyun_ara).
+Araçlar LLM'e metin döndürür; arayüz için aynı sonucun yapılandırılmış hâli .detay'da (AracSonucu)."""
 import json
 import math
 import time
@@ -8,9 +9,8 @@ import chromadb
 import numpy as np
 import pandas as pd
 import requests
-from openai import OpenAI
 
-from src import ayarlar
+from src import ayarlar, llm
 
 ZAYIF_ESIK = ayarlar.ZAYIF_ESIK
 HEPSI_ESIK = ayarlar.HEPSI_ESIK
@@ -30,7 +30,6 @@ istemci = chromadb.PersistentClient(path=str(ayarlar.CHROMA_YOLU))
 yorumlar = istemci.get_collection("yorumlar")
 oyunlar = istemci.get_collection("oyunlar")
 oyun_idleri = pd.read_parquet(ayarlar.ESLEME_DOSYA).groupby("app_id")["parca_id"].apply(list).to_dict()
-llm = OpenAI()
 
 
 def sorgu_vektoru(soru, talimat=QWEN_TALIMAT):
@@ -137,6 +136,8 @@ def ozetle(app_id, k_olumlu=6, k_olumsuz=3, dil=None, aday=40):
         n_aday = min(aday, max(k, math.ceil(len(g) / 2)))
         g.sort(key=lambda y: y["mesafe"])
         g = g[:n_aday]
+        sonuc[grup + "_aday"] = len(g)
+        sonuc[grup + "_kesim"] = g[-1]["mesafe"] if g else None   # 1. elemeden geçen en uzak yorumun mesafesi
         g.sort(key=lambda y: y["faydali_oy"], reverse=True)
         sonuc[grup] = g[:k]
     return sonuc
@@ -153,8 +154,9 @@ Sadece JSON döndür: {"etiket": "evet|hayir|ilgisiz", "gerekce": "Türkçe, en 
 
 
 def etiketle(soru, metin):
-    cevap = llm.chat.completions.create(
-        model=ETIKET_MODEL, temperature=0,
+    # Etiket modeli ayarlar.ETIKET_MODEL'den; sağlayıcı (OpenAI / DeepSeek ...) src/llm.py'den seçilir
+    cevap = llm.istemci(ETIKET_MODEL).chat.completions.create(
+        model=ETIKET_MODEL, temperature=0, **llm.MODEL_AYARLARI.get(ETIKET_MODEL, {}),
         response_format={"type": "json_object"},
         messages=[{"role": "system", "content": ETIKET_TALIMAT},
                   {"role": "user", "content": f"Soru: {soru}\n\nYorum: {metin[:4000]}"}])
@@ -205,6 +207,24 @@ def oyun_ara(istek, w=None, min_oy=100, yetiskin_haric=True, k=10, aday=200):
 
 # ---------- araç fonksiyonları (LLM'e metin döndürür) ----------
 
+class AracSonucu(str):
+    """str gibi davranır (LLM'e giden metin), ek olarak .detay taşır (arayüzde gösterilecek sözlük)."""
+    def __new__(cls, metin, detay=None):
+        nesne = super().__new__(cls, metin)
+        nesne.detay = detay
+        return nesne
+
+
+def yorum_ozeti(y, n=300):
+    """Arayüz için tek yorumun sade hâli (numpy sayıları düz float/int'e çevrilir)."""
+    ozet = {"review_id": y["review_id"], "olumlu": int(y["olumlu"]), "dil": y["dil"], "tarih": y["tarih"],
+            "faydali_oy": int(y["faydali_oy"]), "mesafe": None if y.get("mesafe") is None else float(y["mesafe"]),
+            "metin": kisalt(y["metin"], n)}
+    if "etiket" in y:
+        ozet["etiket"], ozet["gerekce"] = y["etiket"], y["gerekce"]
+    return ozet
+
+
 def kisalt(metin, n=None):
     n = n or METIN_SINIRI
     return metin if len(metin) <= n else metin[:n] + f" [kesildi, toplam {len(metin)} karakter]"
@@ -226,7 +246,11 @@ def yorum_araci(mod, soru=None, app_id=None, olumlu=None, dil=None):
         if not liste:
             return "Bu oyun için yorum verisi yok." if app_id else "Sonuç bulunamadı."
         bas = f"KONU ARAMASI: {len(liste)} yorum, en ilgiliden aşağı. Mesafe {ZAYIF_ESIK} üstü = zayıf eşleşme, kanıt sayma."
-        return bas + "\n\n" + "\n\n".join(yorum_satiri(y) for y in liste)
+        detay = {"mod": "konu", "soru": soru, "app_id": app_id, "olumlu": olumlu, "dil": dil,
+                 "arama": "oyunun yorumları (id + numpy)" if app_id is not None else "bütün yorumlar (Chroma HNSW)",
+                 "taranan_parca": len(oyun_idleri.get(app_id, [])) if app_id is not None else yorumlar.count(),
+                 "zayif_esik": ZAYIF_ESIK, "yorumlar": [yorum_ozeti(y) for y in liste]}
+        return AracSonucu(bas + "\n\n" + "\n\n".join(yorum_satiri(y) for y in liste), detay)
 
     if mod == "ozetle":
         if app_id is None:
@@ -238,7 +262,12 @@ def yorum_araci(mod, soru=None, app_id=None, olumlu=None, dil=None):
                f"Bu oran genel puan değildir, genel puanı SQL'den al. Aşağıdakiler oyunu değerlendiren en faydalı yorumlar.")
         olumlu_k = "\n\n".join(yorum_satiri(y, isaretle=False) for y in s["olumlu"])
         olumsuz_k = "\n\n".join(yorum_satiri(y, isaretle=False) for y in s["olumsuz"]) or "(olumsuz yorum yok)"
-        return f"{bas}\n\n=== OLUMLU ===\n{olumlu_k}\n\n=== OLUMSUZ ===\n{olumsuz_k}"
+        detay = {"mod": "ozetle", "app_id": app_id, "dil": dil, "genel_sorgu": GENEL_SORGU,
+                 "yorum_sayisi": s["yorum_sayisi"], "olumlu_toplam": s["olumlu_toplam"], "olumsuz_toplam": s["olumsuz_toplam"],
+                 "olumlu_aday": s["olumlu_aday"], "olumsuz_aday": s["olumsuz_aday"],
+                 "olumlu_kesim": s["olumlu_kesim"], "olumsuz_kesim": s["olumsuz_kesim"],
+                 "olumlu": [yorum_ozeti(y) for y in s["olumlu"]], "olumsuz": [yorum_ozeti(y) for y in s["olumsuz"]]}
+        return AracSonucu(f"{bas}\n\n=== OLUMLU ===\n{olumlu_k}\n\n=== OLUMSUZ ===\n{olumsuz_k}", detay)
 
     if mod == "hepsi":
         if not soru or app_id is None:
@@ -259,7 +288,13 @@ def yorum_araci(mod, soru=None, app_id=None, olumlu=None, dil=None):
         for etiket in ["evet", "hayir"]:
             for _, y in df[df["etiket"] == etiket].sort_values("mesafe").head(3).iterrows():
                 ornekler.append(f"({etiket}: {y['gerekce']})\n" + yorum_satiri(y, n=300))
-        return f"{bas}\n\nYıllara göre:\n{yillar}\nÖrnekler:\n\n" + "\n\n".join(ornekler)
+        detay = {"mod": "hepsi", "soru": soru, "app_id": app_id, "olumlu": olumlu, "dil": dil, "esik": HEPSI_ESIK,
+                 "etiket_modeli": ETIKET_MODEL, "yorum_sayisi": s["yorum_sayisi"], "aday": s["aday"],
+                 "etiket_sayim": {str(k): int(v) for k, v in sayim.items()},
+                 "yillar": pd.crosstab(df["yil"], df["etiket"]).reset_index().to_dict("records"),
+                 "yorumlar": [yorum_ozeti(y) for y in sorted(s["yorumlar"], key=lambda y: y["mesafe"])]}
+        detay["yillar"] = [{k: (int(v) if k != "yil" else v) for k, v in satir.items()} for satir in detay["yillar"]]
+        return AracSonucu(f"{bas}\n\nYıllara göre:\n{yillar}\nÖrnekler:\n\n" + "\n\n".join(ornekler), detay)
 
     return f"HATA: bilinmeyen mod '{mod}'. Geçerli modlar: konu, ozetle, hepsi."
 
@@ -269,8 +304,11 @@ def oyun_araci(istek, yetiskin_haric=True):
     if not liste:
         return "Bu tarife uyan oyun bulunamadı."
     df = pd.DataFrame(liste)[["app_id", "ad", "oy_sayisi", "mesafe"]]
-    return ("OYUN ARAMASI (tarife göre benzerlik + popülerlik, en uygundan aşağı). "
-            "Puan/fiyat/etiket gibi kesin bilgileri SQL'den kontrol et.\n" + df.to_csv(index=False))
+    detay = {"mod": "oyun_oner", "istek": istek, "yetiskin_haric": yetiskin_haric, "w": OYUN_W, "min_oy": 100,
+             "oyunlar": [{"app_id": int(o["app_id"]), "ad": o["ad"], "oy_sayisi": int(o["oy_sayisi"]),
+                          "mesafe": float(o["mesafe"]), "skor": float(o["skor"])} for o in liste]}
+    return AracSonucu("OYUN ARAMASI (tarife göre benzerlik + popülerlik, en uygundan aşağı). "
+                      "Puan/fiyat/etiket gibi kesin bilgileri SQL'den kontrol et.\n" + df.to_csv(index=False), detay)
 
 
 # ---------- araç tanımları ----------

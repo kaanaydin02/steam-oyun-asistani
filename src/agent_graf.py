@@ -57,10 +57,13 @@ def arac_dugumu(durum):
         tekrar = anahtar in onceki
         sonuc = TEKRAR_MESAJI if tekrar else arac_cagir(c["function"]["name"], c["function"]["arguments"])
         onceki.add(anahtar)
+        detay = getattr(sonuc, "detay", None)   # RAG araçları ayrıntıyı .detay'da taşır (arayüz için)
+        sonuc = str(sonuc)                      # hafızaya ve LLM'e düz metin gider
         yeni_mesajlar.append({"role": "tool", "tool_call_id": c["id"], "content": sonuc})
         kayitlar.append({"tur": durum["tur"], "tip": "arac", "ad": c["function"]["name"],
                          "argumanlar": c["function"]["arguments"], "sure": round(time.perf_counter() - t, 2),
-                         "karakter": len(sonuc), "hata": sonuc.startswith("HATA"), "tekrar": tekrar})
+                         "karakter": len(sonuc), "hata": sonuc.startswith("HATA"), "tekrar": tekrar,
+                         "sonuc_metni": sonuc, "detay": detay})
     return {"mesajlar": yeni_mesajlar, "iz": kayitlar}
 
 

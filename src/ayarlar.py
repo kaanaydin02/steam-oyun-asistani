@@ -26,4 +26,4 @@ ZAYIF_ESIK = 0.45
 HEPSI_ESIK = 0.45
 METIN_SINIRI = 1200
 OYUN_W = 0.03
-ETIKET_MODEL = "gpt-4.1-mini"
+ETIKET_MODEL = "deepseek-flash"
