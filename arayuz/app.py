@@ -439,7 +439,7 @@ if soru:
         with st.spinner(f"{model} düşünüyor, araçları kullanıyor..."):
             try:
                 c = sor(soru, model)
-                metin = c["cevap"] or "_(boş cevap)_"
+                metin = (c["cevap"] or "_(boş cevap)_").replace("$", "\\$")
             except Exception as e:
                 c, metin = None, f"❌ Hata: {e}"
         st.markdown(metin)
