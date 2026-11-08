@@ -1,0 +1,29 @@
+services:
+  api:
+    build: .
+    image: steam-oyun-asistani
+    command: uvicorn src.api:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    env_file: .env
+    environment:
+      OLLAMA_URL: http://host.docker.internal:11434
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/modeller')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 300s
+
+  arayuz:
+    image: steam-oyun-asistani
+    command: streamlit run arayuz/app.py --server.address 0.0.0.0 --server.port 8501
+    ports:
+      - "8501:8501"
+    environment:
+      API_URL: http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
