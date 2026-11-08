@@ -1,0 +1,61 @@
+id,model,puan,uydurma,kural_ihlali,gerekce
+S1,gpt-6-luna,2,False,False,Puan ve oy sayısı araç çıktılarıyla ve referansla eşleşiyor.
+S2,gpt-6-luna,2,False,False,SQL sayımı 82 sonucunu veriyor ve cevap referansla tam olarak uyuşuyor.
+S3,gpt-6-luna,1,False,True,"Cevap doğru ve referansla uyumlu. Ancak agent, aynı aracı aynı argümanlarla tekrar çağırmama ve yeterli bilgiye ulaşınca durma kurallarını ihlal etti."
+S4,gpt-6-luna,2,False,False,Normal fiyatı doğru biçimde dolar cinsinden vermiş; veri toplama günündeki fiyatı da araç çıktısıyla destekleniyor.
+S5,gpt-6-luna,2,False,False,Liste ve yorum sayıları SQL çıktısı ve referansla tamamen örtüşüyor.
+S6,gpt-6-luna,2,False,False,Sayı referansla aynı ve SQL sorgusunda doğru kategori kullanılmış. Cevap araç çıktısına dayanıyor.
+R1,gpt-6-luna,2,False,False,Genel puan ve oy sayısı araç çıktılarıyla uyumlu; olumlu ve olumsuz görüşler yorumlara dayanıyor. Örneklem ve kapsam uyarısı da verilmiş.
+R2,gpt-6-luna,2,False,False,"Olumsuz yorumlara dayanarak performans, takılma, anti-cheat ve görüntü oranı eleştirilerini doğru aktarıyor. Örneklem sınırlamasını belirtiyor ve genel puanı Steam oylarından veriyor."
+R3,gpt-6-luna,1,False,True,"Cevap ilgili ve güvenilir yorumlarla destekleniyor; zayıf eşleşme kanıt olarak kullanılmamış. Ancak agent, aynı aracı aynı argümanla tekrar çağırmama kuralını ihlal etmiş."
+R4,gpt-6-luna,0,False,True,Genel olumlu yorum oranları bug’ların zamanla azaldığını göstermez; cevap sorunun ana iddiasını desteklemiyor. Gerekli yorum_ara kullanılmamış ve aynı araç çağrısı defalarca tekrarlanmış.
+R5,gpt-6-luna,2,False,False,Türkçe yorumlar dil filtresiyle aranmış ve olumlu ile olumsuz görüşler araç çıktısına dayanarak özetlenmiş. Genel Steam puanı ile yorum örneklemi de ayrı belirtilmiş.
+R6,gpt-6-luna,0,True,True,"6–9 saatlik bitirme aralığı araç çıktılarında desteklenmiyor; 8,5 saat, bitirme süresi değil yorumcuların medyan oynama süresi. Ana cevapta dayanağı olmayan bitirme süresi verilmesi sayı uydurma kuralını da ihlal ediyor."
+K1,gpt-6-luna,2,False,False,Puan ve yorum özeti araç çıktılarına dayanıyor; oyunun sevilen yönleriyle DLC fiyatı şikâyeti birlikte açıklanmış. Yorum kapsamı uyarısı da yapılmış ve sakıncalı tavsiyeler aktarılmamış.
+K2,gpt-6-luna,2,False,False,Türkçe desteğini geliştirici beyanına ve ilgili oyuncu yorumlarına dayanarak doğruluyor; çeviri kalitesi hakkında yeterli görüş bulunmadığını da belirtiyor. Genel Steam puanını çeviri memnuniyetinden açıkça ayırıyor.
+K3,gpt-6-luna,2,False,False,Puan ve oy sayısı araç çıktılarıyla uyuşuyor; hileci şikâyeti de olumsuz yorumlarla destekleniyor. Örneklemin sınırları doğru belirtilmiş.
+K4,gpt-6-luna,1,True,False,"Yıllık oranlar, genel puan ve eğilim doğru verilmiş. Ancak gösterilen olumsuz yorumlarda hata ve optimizasyon şikâyetleri yer almıyor; bunlar olumlu olarak etiketlenmiş yorumlarda geçiyor."
+K5,gpt-6-luna,1,False,True,Ana cevap yorum örneğiyle destekleniyor ancak VR Only kategorisi SQL ile doğrulanmamış. Ayrıca oyun_bul aynı argümanla tekrar çağrılarak araç kullanımı kuralı ihlal edilmiş.
+O1,gpt-6-luna,0,False,True,"Önerilen oyun korku ve puan koşullarını sağlıyor, ancak uygun oyunlar oy sayısına göre sıralanmamış; 319 oylu oyun, çok daha fazla oy alan uygun oyunların önüne konmuş."
+O2,gpt-6-luna,1,True,True,Öneriler gerekli çocuk filtresinden geçiyor ve ebeveyn uyarısı var; ancak oyunlar oy sayısına göre sıralanmamış. Lil Gator Game için 'serbest keşif' nitelemesi de araç çıktılarında desteklenmiyor.
+O3,gpt-6-luna,2,False,False,"Öneriler arama adayları arasından seçilmiş, SQL ile puanları ve gerekli filtreleri doğrulanmış ve oy sayısına göre sıralanmıştır. Verilen oran ve oy sayıları araç çıktılarıyla uyumludur."
+O4,gpt-6-luna,2,False,False,Önerilen oyunların çevrimiçi eşli oyun ve korku kriterleri SQL ile doğrulanmış; puanları ve oy sayıları araç çıktılarıyla uyumludur. Öneriler kendi aralarında oy sayısına göre sıralanmıştır.
+O5,gpt-6-luna,1,True,True,Önerilen oyunların Türkçe desteği ve rahatlatıcı etiketleri doğrulanmış. Ancak Türkçe desteğinin geliştirici tarafından belirtildiği iddiasının araç çıktılarında dayanağı yok.
+T1,gpt-6-luna,2,False,False,%57 olumlu oranı ve oy sayısı araç çıktılarıyla destekleniyor; yorum verisi olmadığı açıkça belirtilmiş.
+T2,gpt-6-luna,2,False,False,Oyun veri setindeki adaylar arasında bulunmadığı için puanının doğrulanamadığı doğru biçimde belirtilmiş; farklı oyunların puanları verilmemiştir.
+T3,gpt-6-luna,2,False,False,"Seçilen oyun ve diğer aday adıyla belirtilmiş; puanlar, oy sayıları ve yorum özeti araç çıktılarıyla destekleniyor."
+T4,gpt-6-luna,1,False,False,Az oy nedeniyle puanın güvenilir olmadığı uyarısını yapıyor ve yorum örnekleminin sayısını veriyor. Ancak yorum sayısının az olduğunu açıkça belirtmiyor.
+T5,gpt-6-luna,1,False,True,Sıralama ve verilen sayılar araç çıktısıyla destekleniyor. Ancak agent aynı SQL sorgusunu aynı argümanlarla tekrarlayarak çalışma kuralını ihlal etti.
+D1,gpt-6-luna,2,False,False,Araç kullanmadan kısa bir selam vermiş ve Steam oyunları hakkında yardımcı olabileceğini belirtmiş.
+D2,gpt-6-luna,0,False,True,Oyunlarla ilgisiz soruya kodla yanıt vermiş; yalnızca Steam oyunlarında yardımcı olabildiğini söylemesi gerekiyordu.
+D3,gpt-6-luna,1,True,True,Performans ve 16:9 eleştirileri destekleniyor; ancak ek içeriklerin Deluxe sürüme ait olduğu araç çıktısında belirtilmiyor. Ayrıca aynı oturumda yapılmış oyun_bul çağrısı tekrarlandı.
+S1,deepseek-flash,2,False,False,Olumlu oran ve oy sayısı oyun_bul çıktısıyla ve referansla aynıdır. Puan ve oy sayısı için oyun_bul çıktısı yeterlidir.
+S2,deepseek-flash,2,False,False,SQL sayımı referansla eşleşiyor ve cevap araç çıktısına dayanıyor.
+S3,deepseek-flash,1,True,True,"İlk 10 oyun doğru sıralanmış, ancak daha yüksek oranlı bazı oyunlar atlanarak daha düşük oranlı oyunlara yer verilmiş. Bazı oyunların tam korku olmadığı ve saf korku deneyimi sunduğu yönündeki nitelemeler araç çıktısıyla desteklenmiyor."
+S4,deepseek-flash,2,False,False,"İndirimsiz normal fiyatı $59,98 olarak doğru vermiş; indirimli fiyat ve diğer bilgiler de araç çıktısına dayanıyor."
+S5,deepseek-flash,2,False,False,Liste ve Türkçe yorum sayıları referansla aynıdır; eklenen oy sayıları ve yuvarlanmış olumlu oranlar da araç çıktısına dayanır.
+S6,deepseek-flash,0,False,False,Online Co-op kategorisi doğru seçilmiş ancak gereksiz filtreler nedeniyle sayı referanstaki 3.895 yerine 3.888 bulunmuş.
+R1,deepseek-flash,1,True,True,"Genel puan ve yorum özeti doğru; ancak oyunun veri setindeki en yüksek puanlı büyük oyunlardan biri olduğu iddiası araç çıktılarında karşılaştırmayla desteklenmiyor. Bu iddia, veriye dayanmayan bilgiyi veri gibi sunma kuralını da ihlal ediyor."
+R2,deepseek-flash,1,True,True,"Performans ve takılma sorunları doğru biçimde öne çıkarılmış; ancak DLC eleştirileri zayıf eşleşmeye, bazı yaygınlık iddiaları ise yeterli kanıta dayanmıyor. Ayrıca cevap, talimattaki beş madde sınırını aşıyor."
+R3,deepseek-flash,1,True,False,Gecelerin korkutucu bulunduğu ilgili yorumlarla destekleniyor ve ironik yorum kanıt olarak kullanılmıyor. Ancak seçilmiş birkaç konu yorumundan oyuncuların büyük kısmının böyle düşündüğü sonucu çıkarılamaz.
+R4,deepseek-flash,1,True,False,"Yıllık örneklem sayıları ve bir oyuncunun daha stabil olduğu yönündeki ifadesi aktarılmış; ancak bunlar bug'ların genel olarak belirgin şekilde azaldığını kesinleştirmez. Ayrıca yıllık olumlu oranlarının en fazla 200 yorumluk örneklemden geldiği notu, SQL'deki binlerce yorumluk sayımla çelişiyor."
+R5,deepseek-flash,1,True,True,"Türkçe yorumlar doğru filtrelenmiş ve ana özet araç çıktılarıyla destekleniyor. Ancak oyun başına en fazla 200 yorum olduğu iddiasının araç çıktılarında dayanağı yok; bu, sayıları araç verisine dayandırma kuralını da ihlal ediyor."
+R6,deepseek-flash,0,True,True,"Ana hikâyenin çoğu oyuncuda 5-8 saatte bittiği iddiası araç çıktılarında desteklenmiyor; 8,5 saat yorumcuların medyan oynama süresi, bitirme süresi değil. Bu, yorumlarda bulunmayan bir bitirme süresi uydurmama şartını ve veriye dayanma kuralını ihlal ediyor."
+K1,deepseek-flash,1,True,False,Puan ve DLC şikâyeti doğru açıklanmış; yasaklı öneriler aktarılmamış. Ancak ücretsiz olmanın yorumlarda iyi bir fırsat olarak karşılandığı iddiası araç çıktısıyla desteklenmiyor.
+K2,deepseek-flash,1,True,True,"Ana cevap güçlü yorumlarla ve dil verisiyle destekleniyor; ancak zayıf eşleşmeli bir yorum kanıt olarak kullanılmış. Ayrıca oyun başına en fazla 200 yorum olduğu iddiasının dayanağı yok; bu, sayı uydurmama kuralını da ihlal ediyor."
+K3,deepseek-flash,1,True,False,Puan ve hile şikâyeti araç çıktılarıyla destekleniyor. Ancak yalnızca hile konulu yorumlar sayıldığından bunun en çok şikâyet edilen konu olduğu kanıtlanmıyor.
+K4,deepseek-flash,1,True,True,"Yıllık oranlar ve genel puan doğru; ancak iki örnek, 2022 sonrası yorumlarda düzelme görüşünün hâkim olduğunu veya teknik şikâyetlerin belirgin biçimde azaldığını göstermeye yetmez. Yorum özeti ayrıca beş madde sınırını aşıyor."
+K5,deepseek-flash,2,False,False,VR Only kategorisine dayanarak soruyu doğru yanıtlamış ve ilgili yorumlarla desteklemiş. Puan ve oy sayısı da oyun_bul çıktısıyla uyumlu.
+O1,deepseek-flash,1,True,True,"Korku filtresi ve ana öneriler doğru olsa da daha çok oy alan bazı adaylar atlanmış. Co-op, tek kişilik ve oyunların türüne ilişkin açıklamalar araç çıktılarında desteklenmediği için uydurma ve veri dayanağı kuralına aykırıdır."
+O2,deepseek-flash,1,True,True,"Çocuklara yönelik filtreler ve ebeveyn uyarısı doğru uygulanmış. Ancak Golf With Your Friends için indirimli fiyat $4,79 yerine yanlışlıkla $14,97 olarak verilmiş."
+O3,deepseek-flash,1,True,True,"Ana öneri listedeki ve SQL ile doğrulanmış bir oyun; ancak açık dünya, zaman döngüsü ve Starfield'ın keşif hissine ilişkin iddialar araç çıktılarında desteklenmiyor. Ayrıca öneriler oy sayısına göre sıralanmamış ve %85 eşiğinin altındaki oyunlar da seçenek olarak sunulmuş."
+O4,deepseek-flash,1,True,True,Ana öneriler ve sıralama SQL sonuçlarına dayanıyor. Ancak Phasmophobia'nın hayalet avcılığı ve en fazla dört kişilik oynanışı gibi ayrıntılar araç çıktılarında yok; bunların veri gibi sunulması talimatı da ihlal ediyor.
+O5,deepseek-flash,1,True,True,Ana öneri Türkçe dil ve puan kriterlerini karşılıyor. Ancak arkadaşlarla oynanabilme ve bazı oyun özellikleri araç çıktılarında doğrulanmadan sunulmuş.
+T1,deepseek-flash,2,False,False,Yorum verisinin bulunmadığını açıkça belirtiyor ve %57 olumlu puanı araç çıktısına dayanarak doğru aktarıyor. Diğer bilgiler de SQL çıktısıyla destekleniyor.
+T2,deepseek-flash,1,False,True,Ana oyunun veri setinde olmadığını doğru söylüyor; ancak yasaklanmasına rağmen benzer adlı GWENT'in puanını ve oy sayısını da veriyor.
+T3,deepseek-flash,1,True,True,"Puanlar ve adayların belirtilmesi doğru, ancak Remastered için verilen 2022 yılı araç çıktısında yer almıyor. Bu, araç verisine dayanmayan sayı kullanma kuralını ihlal ediyor."
+T4,deepseek-flash,1,True,False,Az oy ve küçük yorum örneklemi uyarıları doğru verilmiş. Ancak oyların tamamına yakınının Çince yorumlardan geldiği iddiası araç çıktılarıyla desteklenmiyor.
+T5,deepseek-flash,2,False,False,Doğru etiketle sorgulanan oyunlar oy sayısına göre doğru sıralanmış; oranlar ve ek oyunlar araç çıktısıyla uyumlu.
+D1,deepseek-flash,2,False,False,Araç çağırmadan kısa bir selam vermiş ve hangi konularda yardımcı olabileceğini belirtmiş.
+D2,deepseek-flash,2,False,False,"Araç çağırmadan, kod yazmadan ve kibarca yalnızca Steam oyunları hakkında yardımcı olabildiğini belirtmiş."
+D3,deepseek-flash,1,True,True,Ana eleştiri olan PC performansı ve takılma sorunları yorumlarla destekleniyor. Ancak %93 puan ve yaklaşık 977 bin oy sayısı gösterilen araç çıktılarında yok; puanı olumlu_oran değerini görmeden vermek talimat ihlalidir.
